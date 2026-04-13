@@ -1,17 +1,15 @@
 # ============================================================
 # 檔案名稱：docker-compose.yml
-# 功能說明：啟動本地開發環境所需的三個容器服務
+# 功能說明：啟動本地開發環境所需的兩個容器服務
 #           - PostgreSQL：主力本地資料庫（raw layer 儲存）
-#           - pgAdmin：PostgreSQL 圖形化管理介面
 #           - MSSQL：副修資料庫，練習語法差異用
 # 執行方式：docker compose up -d
 # 停止方式：docker compose down
 # 注意事項：
 #   - MSSQL 密碼需符合複雜度要求（大小寫+數字+符號，最少8碼）
-#   - pgAdmin 預設帳號密碼在下方 environment 設定
 #   - 資料會存在 named volume，docker compose down 不會刪資料
 #     若要完全清除：docker compose down -v
-# 最後更新：2026-03-30
+# 最後更新：2026-04-13
 # ============================================================
 
 services:
@@ -29,17 +27,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: medical_pgadmin
-    restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
-    ports:
-      - "5050:80"
-    depends_on:
-      - postgres
 
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
