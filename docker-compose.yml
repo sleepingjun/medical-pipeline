@@ -1,8 +1,9 @@
 # ============================================================
 # 檔案名稱：docker-compose.yml
-# 功能說明：啟動本地開發環境所需的兩個容器服務
+# 功能說明：啟動/執行本地開發環境所需的容器服務
 #           - PostgreSQL：主力本地資料庫（raw layer 儲存）
 #           - MSSQL：副修資料庫，練習語法差異用
+#           - dbt：一次性轉換/測試執行器（profile 啟用）
 # 執行方式：docker compose up -d
 # 停止方式：docker compose down
 # 注意事項：
@@ -40,6 +41,22 @@ services:
       - "1433:1433"
     volumes:
       - mssql_data:/var/opt/mssql
+
+  dbt:
+    build:
+      context: ./docker/dbt
+    profiles:
+      - dbt
+    working_dir: /app/medical_pipeline
+    depends_on:
+      - postgres
+    environment:
+      DBT_PROFILES_DIR: /app/medical_pipeline
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - .:/app
 
 volumes:
   postgres_data:
